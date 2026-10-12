@@ -3,15 +3,14 @@
 # Epoché (Ἐποχή)
 ### *The Local-First Academic Submission Command, Peer-Review War Room & Anti-Amnesia Hub*
 
-[![Live Production](https://img.shields.io/badge/Live%20Demo-epoche--phi.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://epoche-phi.vercel.app)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-sepas1609%2Fepoche-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sepas1609/epoche)
 [![Release](https://img.shields.io/badge/Release-v1.0.0-38bdf8?style=for-the-badge&logo=git&logoColor=white)](https://github.com/sepas1609/epoche/releases/tag/v1.0.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg?style=for-the-badge)](LICENSE)
-[![Zero-Knowledge](https://img.shields.io/badge/Security-100%25%20Client%20Vault-8b5cf6?style=for-the-badge)](https://epoche-phi.vercel.app)
+[![Zero-Knowledge](https://img.shields.io/badge/Security-100%25%20Client%20Vault-8b5cf6?style=for-the-badge)](#-zero-knowledge-privacy--data-security)
 
 <br/>
 
-**[🌐 Launch Live Web Application (epoche-phi.vercel.app)](https://epoche-phi.vercel.app)** • **[Documentation](#-core-architecture)** • **[Quickstart](#-quickstart--local-execution)** • **[Deployment](#-1-click-deployment)**
+**[Documentation](#-core-architecture)** • **[Quickstart & Local Execution](#-quickstart--local-execution)** • **[Lab Hosting](#-laboratory--department-hosting)** • **[Citation](#-citation)**
 
 <br/>
 
@@ -211,20 +210,19 @@ npm run preview
 
 ---
 
-## 🌐 1-Click Deployment
+## 🏛️ Laboratory & Department Hosting
 
-### Deploy to Vercel
-Epoché includes a native [`vercel.json`](vercel.json) single-page configuration:
+Epoché is architected for strict **zero-knowledge, local-first data privacy**. To run or serve Epoché securely within your academic lab, research group, or university intranet without exposing any manuscripts to public networks:
 
+### Local Intranet / Private Network Server
 ```bash
-npx vercel
-```
+# Build the production bundle
+npm run build
 
-Or deploy instantly via the Vercel Dashboard:
-1. Import repository: [`sepas1609/epoche`](https://github.com/sepas1609/epoche).
-2. Framework Preset: **Vite**.
-3. Output Directory: **`dist`**.
-4. Click **Deploy**.
+# Host on lab local intranet / private network
+npx vite preview --host 0.0.0.0 --port 5173
+```
+*Access securely within your lab workstation network (e.g., `http://192.168.x.x:5173` or `http://localhost:5173`). No external public cloud link or telemetry is required.*
 
 ---
 

@@ -21,7 +21,6 @@
   "author": "Saran Boddu & Open Research Community",
   "license": "MIT",
   "devDependencies": {
-    "vercel": "^63.1.2",
     "vite": "^6.0.0"
   }
 }
