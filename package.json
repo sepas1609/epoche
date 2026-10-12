@@ -1,0 +1,26 @@
+{
+  "name": "epoche",
+  "version": "1.0.0",
+  "description": "Epoché (Ἐποχή) — The Local-First Research Submission, Peer-Review War Room & Anti-Amnesia Command Center",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "research",
+    "peer-review",
+    "academic",
+    "submission-tracker",
+    "local-first",
+    "ieee",
+    "springer",
+    "elsevier"
+  ],
+  "author": "Saran Boddu & Open Research Community",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

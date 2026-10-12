@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Epoché (Ἐποχή) — Research Command & Peer-Review War Room</title>
+  <meta name="description" content="Local-first academic submission flight control, reviewer comment dissector, memory capsule, and anti-amnesia deadline tracker for research labs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>Ἐ</text></svg>">
+</head>
+<body class="theme-midnight">
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- App Container -->
+  <div id="app">
+    <!-- Top Global App Bar -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo-glyph">
+          <span class="greek-letter">Ἐ</span>
+          <div class="glyph-orbit"></div>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-row">
+            <h1 class="brand-title">Epoché</h1>
+            <span class="brand-transliteration">/ Ἐποχή /</span>
+            <span class="version-tag">v2.4 Zero-Knowledge</span>
+          </div>
+          <p class="brand-subtitle">The Academic Submission Command & Peer-Review War Room</p>
+        </div>
+      </div>
+
+      <!-- Quick Panic & Status Radar -->
+      <div class="global-pulse-bar" id="global-pulse-bar">
+        <div class="pulse-metric" title="Active manuscripts in flight">
+          <span class="metric-icon">📑</span>
+          <div class="metric-info">
+            <span class="metric-val" id="metric-total-papers">0</span>
+            <span class="metric-lbl">In Pipeline</span>
+          </div>
+        </div>
+        <div class="pulse-divider"></div>
+        <div class="pulse-metric" title="Papers currently undergoing peer review">
+          <span class="metric-icon">⏳</span>
+          <div class="metric-info">
+            <span class="metric-val" id="metric-under-review">0</span>
+            <span class="metric-lbl">Under Review</span>
+          </div>
+        </div>
+        <div class="pulse-divider"></div>
+        <div class="pulse-metric urgent" id="metric-urgent-box" title="Revisions or Camera-Ready deadlines approaching!">
+          <span class="metric-icon pulse-alarm">🚨</span>
+          <div class="metric-info">
+            <span class="metric-val" id="metric-urgent-deadlines">0</span>
+            <span class="metric-lbl">Active Deadlines</span>
+          </div>
+        </div>
+        <div class="pulse-divider"></div>
+        <div class="pulse-metric success" title="Accepted and published papers">
+          <span class="metric-icon">🏆</span>
+          <div class="metric-info">
+            <span class="metric-val" id="metric-accepted">0</span>
+            <span class="metric-lbl">Accepted</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Action Controls -->
+      <div class="header-actions">
+        <!-- Zero-Knowledge Security Badge -->
+        <div class="privacy-badge" title="Zero-Knowledge Architecture: All manuscripts, reviewer notes, and code keys stay 100% on your device's browser memory (IndexedDB). Zero external server tracking.">
+          <svg class="privacy-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+          <span>Client-Only Vault</span>
+        </div>
+
+        <button class="btn btn-outline" id="btn-export-ical" title="Export all paper deadlines into your Google or Apple Calendar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>iCal Sync</span>
+        </button>
+
+        <button class="btn btn-outline" id="btn-vault-manager" title="Export encrypted lab vault or import backup">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Lab Vault</span>
+        </button>
+
+        <button class="btn btn-primary" id="btn-new-paper">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>New Submission</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Hub (Tabs) -->
+    <nav class="app-nav">
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="tab-pipeline">
+          <span class="tab-icon">🚀</span>
+          <span class="tab-title">Mission Control</span>
+          <span class="tab-badge" id="tab-badge-pipeline">0</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-rebuttal">
+          <span class="tab-icon">⚔️</span>
+          <span class="tab-title">Rebuttal War Room</span>
+          <span class="tab-badge warning" id="tab-badge-rebuttal">0</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-oracle">
+          <span class="tab-icon">🏛️</span>
+          <span class="tab-title">Journal Oracle</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-capsule">
+          <span class="tab-icon">🧠</span>
+          <span class="tab-title">Memory Capsules</span>
+          <span class="tab-badge" id="tab-badge-capsules">0</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-sprint">
+          <span class="tab-icon">🍅</span>
+          <span class="tab-title">Revision Sprint</span>
+        </button>
+      </div>
+
+      <!-- Quick Search & Filter Controls -->
+      <div class="nav-filters">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="filter-search" placeholder="Search papers, authors, journals, IDs..." autocomplete="off">
+        </div>
+        <select id="filter-publisher" class="filter-select">
+          <option value="all">All Publishers</option>
+          <option value="IEEE">IEEE</option>
+          <option value="Elsevier">Elsevier</option>
+          <option value="Springer">Springer Nature</option>
+          <option value="ACM">ACM</option>
+          <option value="OpenReview">OpenReview</option>
+          <option value="arXiv">arXiv / Other</option>
+        </select>
+      </div>
+    </nav>
+
+    <!-- Hero Spotlight Banner -->
+    <section class="hero-strip" id="hero-strip">
+      <div class="hero-strip-content">
+        <div class="hero-strip-badge">GEN-Z ANTI-AMNESIA COGNITIVE SHIELD</div>
+        <h2>Never let a 60-day review silence bury your research momentum.</h2>
+        <p>Dissect harsh reviewer critiques into collaborative author tasks, anchor exact code/commit checkpoints, and track review countdowns without trusting your research to cloud servers.</p>
+        <div class="hero-action-buttons">
+          <button class="btn btn-sm btn-accent" id="hero-btn-dissect">
+            <span>⚡ Dissect Reviewer Feedback</span>
+          </button>
+          <button class="btn btn-sm btn-ghost" id="hero-btn-demo">
+            <span>🔄 Reload Verified Lab Benchmark Demo</span>
+          </button>
+        </div>
+      </div>
+      <div class="hero-strip-visual">
+        <img src="/hero-banner.jpg" alt="Epoché Command Center" class="hero-img-preview" />
+      </div>
+      <button class="btn-dismiss-hero" id="btn-dismiss-hero" title="Dismiss banner">✕</button>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- ================= TAB 1: MISSION CONTROL & PIPELINE ================= -->
+      <section class="tab-pane active" id="tab-pipeline">
+        <div class="pipeline-toolbar">
+          <div class="view-mode-toggle">
+            <button class="view-btn active" data-view="kanban" id="btn-view-kanban">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/></svg>
+              <span>Kanban Board</span>
+            </button>
+            <button class="view-btn" data-view="timeline" id="btn-view-timeline">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></svg>
+              <span>Deadlines Radar</span>
+            </button>
+          </div>
+          <div class="pipeline-info-chips">
+            <span class="chip chip-neutral"><span class="dot dot-cyan"></span> Auto-syncing locally</span>
+            <span class="chip chip-amber"><span class="dot dot-amber"></span> 180s review pulse active</span>
+          </div>
+        </div>
+
+        <!-- Kanban Board Container -->
+        <div class="kanban-board-container" id="kanban-view">
+          <div class="kanban-board" id="kanban-board">
+            <!-- Columns dynamically rendered by main.js:
+                 1. Drafting & Prep
+                 2. Submitted & Queued
+                 3. Under Review (Ticking)
+                 4. Revision War Room (Urgent)
+                 5. Camera-Ready & Proofs
+                 6. Accepted & Published
+            -->
+          </div>
+        </div>
+
+        <!-- Timeline / Radar View Container -->
+        <div class="timeline-view-container hidden" id="timeline-view">
+          <div class="radar-card-header">
+            <h3>⏳ Chronological Deadline Radar & Latency Estimator</h3>
+            <p>Calculates standard publisher peer-review cycle times versus your active submission days to identify when to send editor inquiry letters.</p>
+          </div>
+          <div class="timeline-cards-list" id="timeline-cards-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 2: REBUTTAL WAR ROOM ================= -->
+      <section class="tab-pane" id="tab-rebuttal">
+        <div class="rebuttal-container">
+          <!-- Left: Paper selector & Raw feedback paste area -->
+          <div class="rebuttal-sidebar">
+            <div class="panel-box">
+              <div class="panel-title-row">
+                <h3>Select Target Paper</h3>
+              </div>
+              <select id="rebuttal-paper-select" class="form-input">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="panel-box">
+              <div class="panel-title-row">
+                <h3>⚡ Reviewer Comment Dissector</h3>
+                <span class="badge-pill">Auto-Splitting</span>
+              </div>
+              <p class="panel-desc">Paste the raw decision letter or reviewer reports from IEEE, Springer, or Elsevier. Epoché splits them into actionable cards.</p>
+              
+              <textarea id="raw-review-input" class="raw-review-textarea" placeholder="Paste decision email here:
+e.g.
+Reviewer #1:
+1. The authors should verify the CCM boundary at 400W load.
+2. In Figure 7, the switching losses do not account for diode reverse recovery.
+
+Reviewer #2:
+1. Literature review lacks comparison with recent 2025 quadratic converters..."></textarea>
+              
+              <div class="rebuttal-actions-row">
+                <button class="btn btn-accent btn-block" id="btn-dissect-comments">
+                  <span>⚡ Parse & Distribute to Team</span>
+                </button>
+                <button class="btn btn-ghost btn-sm btn-block" id="btn-load-sample-review">
+                  <span>Load Sample Peer-Review Feedback</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Export Tools -->
+            <div class="panel-box export-box">
+              <div class="panel-title-row">
+                <h3>📄 Export Rebuttal Document</h3>
+              </div>
+              <p class="panel-desc">Compile all completed author responses into formal publication-standard documents.</p>
+              <div class="export-buttons-grid">
+                <button class="btn btn-outline btn-sm" id="btn-export-latex">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <span>LaTeX (.tex)</span>
+                </button>
+                <button class="btn btn-outline btn-sm" id="btn-export-markdown">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="7 15 10 9 13 15"/><line x1="17" y1="9" x2="17" y2="15"/></svg>
+                  <span>Markdown (.md)</span>
+                </button>
+                <button class="btn btn-outline btn-sm" id="btn-preview-formal-letter">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <span>Print Preview</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Comment Matrix & Cards -->
+          <div class="rebuttal-main">
+            <div class="rebuttal-main-header">
+              <div class="rebuttal-header-meta">
+                <h2 id="rebuttal-paper-title-display">Select a paper to view rebuttal matrix</h2>
+                <div class="rebuttal-progress-bar-container">
+                  <div class="rebuttal-progress-stats">
+                    <span id="rebuttal-stats-counter">0 of 0 Comments Resolved (0%)</span>
+                    <span id="rebuttal-urgency-chip" class="chip chip-amber">Awaiting Input</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" id="rebuttal-progress-fill" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Filter tabs for comments -->
+              <div class="comment-filter-strip" id="comment-filter-strip">
+                <button class="comment-filter-btn active" data-reviewer="all">All Comments</button>
+                <button class="comment-filter-btn" data-reviewer="Reviewer 1">Reviewer 1</button>
+                <button class="comment-filter-btn" data-reviewer="Reviewer 2">Reviewer 2</button>
+                <button class="comment-filter-btn" data-reviewer="Reviewer 3">Reviewer 3</button>
+                <button class="btn btn-sm btn-outline ml-auto" id="btn-add-custom-comment">+ Add Comment</button>
+              </div>
+            </div>
+
+            <!-- List of Dissected Comment Cards -->
+            <div class="comments-card-list" id="comments-card-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 3: JOURNAL ORACLE ================= -->
+      <section class="tab-pane" id="tab-oracle">
+        <div class="oracle-container">
+          <div class="oracle-grid">
+            <!-- Left: Directory of Journal Portals & Standard Latencies -->
+            <div class="oracle-col-main">
+              <div class="section-card">
+                <div class="section-card-title">
+                  <div class="card-title-icon">🏛️</div>
+                  <div>
+                    <h3>Global Publishing Portals & Benchmarks</h3>
+                    <p>Direct portal access links, typical review durations, and recommended inquiry windows.</p>
+                  </div>
+                </div>
+
+                <div class="portals-directory-grid" id="portals-directory-grid">
+                  <!-- Rendered dynamically from seedData portals -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Polite Editor-in-Chief Letter Generator -->
+            <div class="oracle-col-side">
+              <div class="section-card">
+                <div class="section-card-title">
+                  <div class="card-title-icon">✉️</div>
+                  <div>
+                    <h3>Editor-in-Chief Inquiry Kit</h3>
+                    <p>Generate courteous, publication-grade academic correspondence letters in seconds.</p>
+                  </div>
+                </div>
+
+                <div class="inquiry-form-group">
+                  <label class="form-label" for="inquiry-template-select">Letter Purpose</label>
+                  <select id="inquiry-template-select" class="form-input">
+                    <option value="status_inquiry">Courteous Status Inquiry (> 90 Days Under Review)</option>
+                    <option value="deadline_extension">14-Day Revision Extension Request</option>
+                    <option value="author_order">Author Order & Affiliation Confirmation</option>
+                    <option value="withdrawal">Formal Manuscript Withdrawal Notice</option>
+                    <option value="proof_correction">Expedited Galley Proofs Clarification</option>
+                  </select>
+                </div>
+
+                <div class="inquiry-form-group">
+                  <label class="form-label" for="inquiry-paper-select">Select Paper Details</label>
+                  <select id="inquiry-paper-select" class="form-input">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+
+                <div class="inquiry-output-wrapper">
+                  <div class="output-header">
+                    <span>Generated Academic Letter</span>
+                    <button class="btn btn-xs btn-outline" id="btn-copy-inquiry">
+                      <span>📋 Copy to Clipboard</span>
+                    </button>
+                  </div>
+                  <textarea id="inquiry-output-text" class="inquiry-textarea" readonly></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: MEMORY CAPSULES ================= -->
+      <section class="tab-pane" id="tab-capsule">
+        <div class="capsules-container">
+          <div class="capsules-header">
+            <div>
+              <h2>🧠 Research Memory Capsules</h2>
+              <p>Solve post-submission amnesia. When reviews arrive 6 months later, immediately locate the exact Git commit, Overleaf project, dataset snapshot, and experimental bench configuration.</p>
+            </div>
+            <div class="capsule-quick-search">
+              <input type="text" id="capsule-search-box" placeholder="Search experiments, code branches, datasets..." class="form-input">
+            </div>
+          </div>
+
+          <div class="capsules-grid" id="capsules-grid">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 5: REVISION SPRINT & POMODORO ================= -->
+      <section class="tab-pane" id="tab-sprint">
+        <div class="sprint-container">
+          <div class="sprint-card">
+            <div class="sprint-header">
+              <span class="badge-pill accent">ADHD & DEADLINE COMBAT MODE</span>
+              <h2>Deep Work Revision Sprint</h2>
+              <p>Lock in for high-cognitive-load rebuttal tasks with ambient synthesized acoustics and zero-distraction micro-milestones.</p>
+            </div>
+
+            <!-- Timer Display -->
+            <div class="sprint-timer-circle">
+              <svg class="timer-svg" viewBox="0 0 200 200">
+                <circle class="timer-track" cx="100" cy="100" r="90"></circle>
+                <circle class="timer-progress" id="timer-progress-ring" cx="100" cy="100" r="90"></circle>
+              </svg>
+              <div class="timer-inner-content">
+                <span class="timer-digits" id="timer-display">25:00</span>
+                <span class="timer-label" id="timer-phase-lbl">Focus Round 1 of 4</span>
+              </div>
+            </div>
+
+            <!-- Timer Controls -->
+            <div class="timer-controls">
+              <button class="btn btn-outline btn-timer-preset active" data-minutes="25">25m Sprint</button>
+              <button class="btn btn-outline btn-timer-preset" data-minutes="50">50m Ultra</button>
+              <button class="btn btn-outline btn-timer-preset" data-minutes="5">5m Break</button>
+            </div>
+
+            <div class="timer-buttons-main">
+              <button class="btn btn-primary btn-lg" id="btn-timer-toggle">
+                <span id="timer-btn-text">▶ Start Sprint</span>
+              </button>
+              <button class="btn btn-ghost" id="btn-timer-reset">↺ Reset</button>
+            </div>
+
+            <!-- Built-in Web Audio Acoustic Synthesizer -->
+            <div class="sound-synthesizer-bar">
+              <span class="sound-lbl">🎧 Ambient Sound Generator (Offline WebAudio):</span>
+              <div class="sound-presets">
+                <button class="sound-btn active" data-sound="off">Mute</button>
+                <button class="sound-btn" data-sound="binaural">Alpha Waves</button>
+                <button class="sound-btn" data-sound="brown">Deep Brown Noise</button>
+                <button class="sound-btn" data-sound="rain">Synthetic Rain</button>
+              </div>
+            </div>
+
+            <!-- Focus Scratchpad -->
+            <div class="sprint-scratchpad">
+              <label class="form-label" for="sprint-notes">Active Sprint Scratchpad (Auto-saved)</label>
+              <textarea id="sprint-notes" class="scratchpad-textarea" placeholder="Note down immediate equations, simulation seeds, or reviewer quotes you are currently untangling..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- 1. Paper Details & Edit Modal -->
+    <div class="modal-backdrop hidden" id="modal-paper-details">
+      <div class="modal-dialog modal-dialog-lg">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="modal-status-badge" id="modal-paper-stage-badge">Under Review</span>
+            <h3 id="modal-paper-title">Paper Details</h3>
+          </div>
+          <button class="modal-close-btn" id="btn-close-paper-modal">✕</button>
+        </div>
+        <div class="modal-body" id="modal-paper-body">
+          <!-- Dynamically filled with full paper fields & editing form -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. New Paper Modal -->
+    <div class="modal-backdrop hidden" id="modal-new-paper">
+      <div class="modal-dialog modal-dialog-lg">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="badge-pill accent">NEW SUBMISSION</span>
+            <h3>Add Paper to Epoché Command</h3>
+          </div>
+          <button class="modal-close-btn" id="btn-close-new-paper-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="form-new-paper" class="app-form">
+            <div class="form-grid-2">
+              <div class="form-group span-2">
+                <label class="form-label" for="new-paper-title">Manuscript Title *</label>
+                <input type="text" id="new-paper-title" class="form-input" required placeholder="e.g. Robust Direct Torque Control of PMSG Wind Turbines...">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-paper-journal">Target Journal / Conference *</label>
+                <input type="text" id="new-paper-journal" class="form-input" required placeholder="e.g. IEEE Transactions on Industrial Electronics">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-paper-publisher">Publisher *</label>
+                <select id="new-paper-publisher" class="form-input">
+                  <option value="IEEE">IEEE</option>
+                  <option value="Elsevier">Elsevier</option>
+                  <option value="Springer">Springer Nature</option>
+                  <option value="ACM">ACM</option>
+                  <option value="OpenReview">OpenReview</option>
+                  <option value="arXiv">arXiv / Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-paper-tracking-id">Tracking ID / Manuscript #</label>
+                <input type="text" id="new-paper-tracking-id" class="form-input" placeholder="e.g. TIE-2026-0814">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-paper-stage">Current Stage *</label>
+                <select id="new-paper-stage" class="form-input">
+                  <option value="drafting">Drafting & Lab Prep</option>
+                  <option value="submitted">Submitted & Queued</option>
+                  <option value="under_review">Under Review</option>
+                  <option value="revision_war_room">Revision / Rebuttal War Room</option>
+                  <option value="camera_ready">Camera-Ready & Proofs</option>
+                  <option value="accepted">Accepted & Published</option>
+                </select>
+              </div>
+              <div class="form-group span-2">
+                <label class="form-label" for="new-paper-authors">Authors & Roles (Comma separated) *</label>
+                <input type="text" id="new-paper-authors" class="form-input" required placeholder="e.g. Saran Boddu (Lead), Dr. K. Rao (PI), M. Karthik (Simulations)">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-paper-sub-date">Submission Date</label>
+                <input type="date" id="new-paper-sub-date" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-paper-deadline">Critical Deadline (Rebuttal / Camera Ready)</label>
+                <input type="date" id="new-paper-deadline" class="form-input">
+              </div>
+              <div class="form-group span-2">
+                <label class="form-label" for="new-paper-portal-url">Portal Tracking URL</label>
+                <input type="url" id="new-paper-portal-url" class="form-input" placeholder="https://mc.manuscriptcentral.com/...">
+              </div>
+              
+              <!-- Memory Capsule Fields -->
+              <div class="form-group span-2 memory-group-header">
+                <span class="badge-pill">🧠 Memory Capsule (Solve 6-Month Amnesia)</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-paper-overleaf">Overleaf Project URL</label>
+                <input type="url" id="new-paper-overleaf" class="form-input" placeholder="https://www.overleaf.com/project/...">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-paper-git">Git Commit / Branch</label>
+                <input type="text" id="new-paper-git" class="form-input" placeholder="e.g. commit 9f4b12c / branch main">
+              </div>
+              <div class="form-group span-2">
+                <label class="form-label" for="new-paper-dataset">Dataset / Code Drive Link</label>
+                <input type="text" id="new-paper-dataset" class="form-input" placeholder="e.g. Google Drive / Zenodo / GitHub release link">
+              </div>
+              <div class="form-group span-2">
+                <label class="form-label" for="new-paper-notes">Key Experiment & Model Notes</label>
+                <textarea id="new-paper-notes" class="form-input" rows="2" placeholder="e.g. Simscape model at /sim/pmsg_dtc.slx. Sampling time 5e-6s. DC link 700V."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-ghost" id="btn-cancel-new-paper">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save to Command</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Lab Vault Modal (Backup & Restore) -->
+    <div class="modal-backdrop hidden" id="modal-vault">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="badge-pill accent">PRIVACY & PORTABILITY</span>
+            <h3>Lab Data Vault</h3>
+          </div>
+          <button class="modal-close-btn" id="btn-close-vault-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="vault-info-banner">
+            <p><strong>100% Client-Side Privacy:</strong> Your unpublished manuscripts and comments are stored only in your local browser IndexedDB. To share with your research group or migrate computers, export your encrypted Lab Vault file.</p>
+          </div>
+          <div class="vault-action-cards">
+            <div class="vault-card">
+              <h4>📦 Export Lab Vault (`.epoche`)</h4>
+              <p>Save all papers, reviewer cards, and memory capsules into a portable JSON backup file.</p>
+              <button class="btn btn-primary btn-block" id="btn-download-vault">Download `.epoche` Vault</button>
+            </div>
+            <div class="vault-card">
+              <h4>📥 Restore / Import Vault</h4>
+              <p>Load an `.epoche` vault file from your computer or collaborator.</p>
+              <input type="file" id="input-vault-file" accept=".json,.epoche" class="hidden">
+              <button class="btn btn-outline btn-block" id="btn-upload-vault-trigger">Choose `.epoche` File</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Rebuttal Letter Print Preview Modal -->
+    <div class="modal-backdrop hidden" id="modal-rebuttal-preview">
+      <div class="modal-dialog modal-dialog-lg">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="badge-pill success">FORMAL ACADEMIC REBUTTAL</span>
+            <h3>Point-by-Point Response to Reviewers</h3>
+          </div>
+          <button class="modal-close-btn" id="btn-close-rebuttal-preview">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="preview-actions-bar">
+            <button class="btn btn-outline btn-sm" id="btn-print-rebuttal">🖨️ Print / Save as PDF</button>
+            <button class="btn btn-outline btn-sm" id="btn-copy-preview-text">📋 Copy Formatted Text</button>
+          </div>
+          <div class="academic-letter-preview" id="academic-letter-preview-content">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
