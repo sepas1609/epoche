@@ -1,19 +1,48 @@
+<div align="center">
+
 # Epoché (Ἐποχή)
-> *The Local-First Academic Submission Command, Peer-Review War Room & Anti-Amnesia Hub*
+### *The Local-First Academic Submission Command, Peer-Review War Room & Anti-Amnesia Hub*
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
-![Domain-Academic%20Research](https://img.shields.io/badge/Domain-Academic%20Research-blue)
-![Architecture-Zero--Knowledge](https://img.shields.io/badge/Architecture-Zero--Knowledge%20Client-emerald)
-![Engine-Vite%202026](https://img.shields.io/badge/Engine-Vite%20Vanilla%20JS-cyan)
-![Deployment-Vercel%20Ready](https://img.shields.io/badge/Deployment-Vercel%20Ready-black)
+[![Live Production](https://img.shields.io/badge/Live%20Demo-epoche--phi.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://epoche-phi.vercel.app)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-sepas1609%2Fepoche-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sepas1609/epoche)
+[![Release](https://img.shields.io/badge/Release-v1.0.0-38bdf8?style=for-the-badge&logo=git&logoColor=white)](https://github.com/sepas1609/epoche/releases/tag/v1.0.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg?style=for-the-badge)](LICENSE)
+[![Zero-Knowledge](https://img.shields.io/badge/Security-100%25%20Client%20Vault-8b5cf6?style=for-the-badge)](https://epoche-phi.vercel.app)
 
-**Epoché** (pronounced *eh-poh-KAY*, from ancient Greek ἐποχή: *"suspension of judgment"*) is an open-source, zero-knowledge mission-control platform designed for university laboratories, research groups, and multi-domain academic teams submitting manuscripts across major international publishing houses (IEEE, Elsevier, Springer Nature, ACM, OpenReview, arXiv).
+<br/>
+
+**[🌐 Launch Live Web Application (epoche-phi.vercel.app)](https://epoche-phi.vercel.app)** • **[Documentation](#-core-architecture)** • **[Quickstart](#-quickstart--local-execution)** • **[Deployment](#-1-click-deployment)**
+
+<br/>
+
+<img src="./public/hero-banner.jpg" alt="Epoché Academic Research Command Center" width="850" style="border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+
+</div>
 
 ---
 
-## 📊 Pipeline & System Architecture
+## 🏛️ What is Epoché?
 
-The flowchart below visualizes the core architecture, client-side data flows, review dissection heuristics, and output synthesis pipelines of **Epoché**:
+In classical Pyrrhonian philosophy and phenomenology, **Epoché** (pronounced *eh-poh-KAY*, from ancient Greek *ἐποχή*) denotes the deliberate **"suspension of judgment"**. 
+
+This is the exact philosophical and operational state of a scientific manuscript under peer review: your findings and hypotheses are held in careful deliberation by the international academic community while awaiting judgment.
+
+**Epoché** is an open-source, zero-knowledge flight-control dashboard built for university laboratories, research groups, graduate scholars, and interdisciplinary faculty submitting papers across international publishing houses (**IEEE, Elsevier, Springer Nature, ACM, OpenReview, arXiv**).
+
+---
+
+## ⚡ The Four Crises Epoché Solves
+
+| Traditional Research Pain Point | The Reality | How Epoché Solves It |
+| :--- | :--- | :--- |
+| **1. The Single-Inbox Blindspot** | Journal editorial portals (ScholarOne, Editorial Manager, SNAPP) only email the primary corresponding author. Co-authors and graduate students remain blind to review updates unless forwarded manually. | **Unified Mission Control**: Centralizes status, manuscript tracking IDs, direct portal links, and co-author responsibilities on an open team canvas. |
+| **2. Post-Submission Amnesia** | Academic peer review cycles take **3 to 9 months**. By the time decision letters arrive, authors forget which dataset version, simulation seed, or Git commit produced specific figures. | **Memory Capsules**: Permanently binds every paper to its exact Overleaf URL, Git branch + commit hash, Zenodo/Drive dataset snapshot, and lab bench notes. |
+| **3. The Revision Panic Window** | Major revisions (30 days) and conference rebuttal windows (5–7 days) trigger cognitive paralysis when trying to dissect dense 5-page reviewer critiques into assigned tasks. | **Reviewer Comment Dissector**: Heuristic regex engine that parses unstructured review emails into atomic cards (`R1.1`, `R1.2`, `R2.1`) and generates LaTeX/Markdown response letters. |
+| **4. Intellectual Property Leaks** | Unpublished research cannot be uploaded to commercial cloud platforms or untrusted servers without risking intellectual property breaches. | **Zero-Knowledge Client Storage**: 100% of manuscripts, comments, and keys reside strictly in the browser's `IndexedDB` & `localStorage`. Zero server footprint. |
+
+---
+
+## 📊 Core Architecture & Data Isolation
 
 ```mermaid
 graph TD
@@ -27,7 +56,7 @@ graph TD
     subgraph "Phase 2: Ingestion & Pipeline Control"
         B1["New Manuscript Intake"] --> B2["Metadata & Tracking ID Extraction"]
         B2 --> B3["Memory Capsule Binding (Overleaf, Git, Dataset)"]
-        B3 --> B4["Kanban Flight Controller (6 Academic Stages)"]
+        B2 --> B4["Kanban Flight Controller (6 Academic Stages)"]
         B4 --> B5["Chronological Deadline Radar & Latency Estimator"]
         B5 --> B6["iCalendar RFC 5545 Sync (.ics Export)"]
     end
@@ -57,125 +86,168 @@ graph TD
 
 ---
 
-## 🔍 Abstract & Research Context
+## ⚔️ Rebuttal Dissection & Reviewer Matrix Lifecycle
 
-Multi-author academic research faces four systemic operational bottlenecks:
-1. **The Single-Inbox Bottleneck**: Journal editorial systems (ScholarOne, Editorial Manager, SNAPP) only communicate with the corresponding author, leaving student co-authors and interdisciplinary collaborators blind to status shifts and review decisions.
-2. **Post-Submission Cognitive Amnesia**: Long review cycles (3 to 9 months) sever working memory. When reviews return, authors have often forgotten which dataset version, simulation seed, or Git commit generated specific figures.
-3. **The Revision Panic Window**: Intense rebuttal windows (5–7 days for conferences, 30 days for IEEE/Elsevier major revisions) overwhelm teams attempting to parse dense 5-page reviewer reports into assigned tasks.
-4. **Confidentiality & Academic Ethics**: Unpublished research cannot be uploaded to third-party commercial cloud databases without risking intellectual property breaches.
+```mermaid
+stateDiagram-v2
+    [*] --> RawFeedbackInput: Decision Letter Received
+    RawFeedbackInput --> HeuristicSplitting: Click "⚡ Parse & Distribute"
+    
+    state HeuristicSplitting {
+        [*] --> HeaderDetection: Match "Reviewer #X:" / "AE:"
+        HeaderDetection --> PointExtraction: Match "1.", "2.", "Concern:"
+        PointExtraction --> SeverityClassification: Heuristic Keyword Scan
+    }
 
-**Epoché** resolves this through an **offline-capable, zero-knowledge client-first web architecture**:
-* All manuscripts, reviewer criticisms, and rebuttal matrices remain strictly inside the user's browser memory (`IndexedDB` & `localStorage`).
-* Zero bytes of proprietary research data ever leak to external cloud servers.
-* Teams exchange data securely via encrypted `.epoche` vault exports or self-hosted Git repositories.
+    HeuristicSplitting --> ActionMatrix: Atomic Comment Cards Generated
+    
+    state ActionMatrix {
+        Pending --> InProgress: Assigned to Co-Author
+        InProgress --> Drafted: Response & Figure Revision
+        Drafted --> Approved: PI / Advisor Verification
+    }
 
----
-
-## 🌟 Core Modules
-
-| Module | Purpose | Key Capabilities |
-| :--- | :--- | :--- |
-| **🚀 Mission Control** | Submission flight control | 6-stage Kanban board, real-time revision countdowns, 7-day panic alarms, publisher latency benchmarks. |
-| **⚔️ Rebuttal War Room** | Reviewer criticism breakdown | Smart regex parser that auto-splits raw decision emails into atomic cards, team assignment matrix, point-by-point progress bar. |
-| **📄 Publication Exporter** | Formal rebuttal creation | 1-click generation of camera-ready **LaTeX (`.tex`)**, **Markdown (`.md`)**, and academic **Print Preview** response letters. |
-| **🏛️ Journal Oracle** | Platform directory & diplomacy | Directory of global publisher portals (IEEE, Elsevier, Springer) with polite Editor-in-Chief correspondence generators. |
-| **🧠 Memory Capsules** | Anti-amnesia checkpoints | Permanent anchors linking papers to exact Overleaf projects, Git commit hashes, dataset drives, and hardware notes. |
-| **🍅 Revision Sprint** | ADHD & deadline crunch mode | 25m/50m deep work Pomodoro with offline Web Audio acoustic synthesizer (10Hz Binaural Alpha Waves, Brown Noise, Rain). |
-| **🛠️ Developer Console** | Admin telemetry & diagnosis | Storage quota inspector, active permission scopes, raw JSON database viewer, and 1-click test benchmark injection. |
-
----
-
-## 📁 Repository Structure
-
-```
-epoche/
-├── index.html                   # Semantic HTML5 Application Shell & Dialogs
-├── package.json                 # Project dependencies & Vite scripts
-├── vercel.json                  # Vercel SPA deployment configuration
-├── .gitignore                   # Standard node & build artifact exclusions
-├── public/
-│   └── hero-banner.jpg          # Holographic Research Command Visual Asset
-└── src/
-    ├── style.css                # Midnight Obsidian glassmorphism design system
-    ├── main.js                  # Application controller, state sync & event loops
-    ├── data/
-    │   └── seedData.js          # Verified benchmark research fixtures & portal metadata
-    └── services/
-        ├── auth.js              # Client vs. Developer Role-Based Access Control (RBAC)
-        ├── storage.js           # Zero-knowledge IndexedDB engine & .epoche vault export
-        ├── parser.js            # Smart regex reviewer comment auto-dissector
-        ├── rebuttalGenerator.js # Publication-grade LaTeX, Markdown, & HTML rebuttal generator
-        ├── inquiryTemplates.js  # Courteous Editor-in-Chief correspondence letter templates
-        └── audio.js             # Offline Web Audio API binaural & noise acoustic synthesizer
+    ActionMatrix --> Compilation: 100% Comments Resolved
+    Compilation --> LaTeXExport: Download .tex Rebuttal Document
+    Compilation --> MarkdownExport: Download .md Notes
+    Compilation --> PrintPreview: Formal Academic Letter PDF
+    LaTeXExport --> [*]
 ```
 
 ---
 
-## 🚀 Setup and Local Execution
+## 🌟 Modules & Capabilities
+
+### 1. 🚀 Mission Control & Pipeline
+* **6 Academic Stages**: `Drafting & Lab Prep` ➔ `Submitted & Queued` ➔ `Under Review` ➔ `Revision War Room` ➔ `Camera-Ready & Proofs` ➔ `Accepted & Published`.
+* **Live Countdown Timers**: Real-time ticking down to the exact day/hour for revision and camera-ready cutoffs.
+* **Panic Radar**: Automatic pulsing crimson warning alerts when deadlines drop under 7 days.
+* **Quick-Delete Cards**: 1-click `🗑️` deletion directly on cards with instant pipeline recalculations.
+
+### 2. ⚔️ Rebuttal War Room & Comment Dissector
+* **Smart Reviewer Parser**: Paste unstructured decision emails; Epoché extracts individual remarks (`Reviewer 1 • Point 1`, `Reviewer 2...`) into actionable cards.
+* **Co-Author Task Delegation**: Assign specific comments to specific lab members (e.g., *Hardware Oscilloscope Captures: Saran*, *Mathematical Proof: Dr. Rao*).
+* **Publication-Grade Rebuttal Generator**: 1-click export of formal Point-by-Point Response documents in **LaTeX (`.tex`)**, **Markdown (`.md`)**, or **Print Preview / PDF** formatted for IEEE and Springer Nature editorial styles.
+
+### 3. 🏛️ Journal Oracle & Editor Inquiry Kit
+* **Portal Gateway Directory**: Quick links and typical turnaround benchmarks for **ScholarOne**, **Elsevier Editorial Manager**, **Springer Nature SNAPP**, **OpenReview**, **Microsoft CMT**, and **arXiv**.
+* **EIC Inquiry Kit**: Pre-drafted, respectful academic letters with automatic variable interpolation:
+  * *Courteous Status Inquiry (> 90 Days Under Review)*
+  * *14-Day Revision Extension Request*
+  * *Author Order & Affiliation Confirmation*
+  * *Formal Manuscript Withdrawal Notice*
+  * *Expedited Galley Proofs Clarification*
+
+### 4. 🧠 Research Memory Capsules (Anti-Amnesia)
+* Permanent anchors linking every paper to:
+  * Clickable **Overleaf Project URL**
+  * Exact **Git Commit Hash & Branch** (e.g., `commit 9f4b12c: zvt-boundary-ccm`)
+  * **Dataset / Cloud Drive link** (Zenodo, Google Drive, HuggingFace)
+  * **Lab bench configuration notes** (e.g., *MATLAB R2024b Simscape discrete solver at Ts=1e-6s, oscilloscope probe calibration*).
+
+### 5. 🍅 Revision Sprint (ADHD & Deep Focus Mode)
+* 25m / 50m Pomodoro sprint timer with SVG circular progress rings.
+* **Offline Web Audio Acoustic Synthesizer**: Generates 10Hz Binaural Alpha Waves, Deep Brown Noise, and Synthetic Rain directly through browser audio nodes (zero external audio files or downloads).
+
+### 6. 🛠️ Developer Console & Diagnostics
+* **Storage Telemetry**: Real-time inspection of browser LocalStorage / IndexedDB byte consumption, proving zero external cloud leakage.
+* **Active Session Inspector**: Displays session tokens, timestamps, and active permission scopes.
+* **Raw JSON Ledger**: Live view and copy of the raw database records.
+* **Mock Benchmark Controller**: 1-click injection of verified IEEE/Elsevier/ACM benchmark fixtures for demonstration, and instant storage purge for clean slates.
+
+---
+
+## 📊 Feature Comparison Matrix
+
+| Feature | Epoché | Overleaf | Notion / Trello | Google Sheets | Zotero |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **100% Zero-Knowledge Client Storage** | ✅ Yes | ❌ Cloud | ❌ Cloud | ❌ Cloud | ❌ Cloud Sync |
+| **Reviewer Comment Auto-Dissector** | ✅ Yes | ❌ No | ❌ Manual | ❌ Manual | ❌ No |
+| **Multi-Author Task Delegation Matrix** | ✅ Yes | ❌ No | ⚠️ Partial | ⚠️ Partial | ❌ No |
+| **Point-by-Point LaTeX Rebuttal Exporter**| ✅ Yes | ⚠️ Manual | ❌ No | ❌ No | ❌ No |
+| **Publisher Latency Benchmarks (IEEE/Elsevier)**| ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Pre-written Editor-in-Chief Inquiry Kit**| ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Memory Capsules (Overleaf + Git Anchors)**| ✅ Yes | ⚠️ Self | ⚠️ Manual | ⚠️ Manual | ❌ No |
+| **Offline Web Audio Acoustic Synthesizer**| ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No |
+| **1-Click RFC 5545 iCalendar (.ics) Sync** | ✅ Yes | ❌ No | ⚠️ Plugin | ❌ No | ❌ No |
+
+---
+
+## 🔒 Security & Privacy Invariants
+
+Epoché operates under an absolute **Zero-Knowledge invariant**:
+* **Origin-Isolated Persistence**: All data is saved in origin-isolated `localStorage` and `IndexedDB`.
+* **Zero Cloud Telemetry**: Zero user papers, research notes, equations, or reviewer critiques ever leave your browser.
+* **Encrypted Vault Portability**: Research data leaves your machine only when you explicitly export an `.epoche` vault file.
+
+---
+
+## 🚀 Quickstart & Local Execution
 
 ### Prerequisites
 * **Node.js** (v18.0.0 or higher)
 * **npm** (v9.0.0 or higher)
 
 ### Installation
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/sepas1609/epoche.git
-   cd epoche
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/sepas1609/epoche.git
+cd epoche
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+# Install dependencies
+npm install
 
-3. Launch local development server:
-   ```bash
-   npm run dev
-   ```
-   Open **`http://localhost:5173`** in your browser.
+# Start local development server
+npm run dev
+```
 
-4. Build production bundle:
-   ```bash
-   npm run build
-   ```
+Visit **`http://localhost:5173`** in your browser.
+
+### Production Build
+```bash
+npm run build
+npm run preview
+```
 
 ---
 
-## 🌐 Deploying to Vercel (1-Click & CLI)
+## 🌐 1-Click Deployment
 
-Epoché is pre-configured with [`vercel.json`](vercel.json) for instant deployment:
+### Deploy to Vercel
+Epoché includes a native [`vercel.json`](vercel.json) single-page configuration:
 
-### Option 1: Via Vercel CLI
 ```bash
 npx vercel
 ```
-* Follow the CLI prompt to select your scope.
-* Vercel will detect Vite automatically and deploy directly.
 
-### Option 2: Via Vercel Web Dashboard
-1. Navigate to [vercel.com/new](https://vercel.com/new).
-2. Import the GitHub repository: `sepas1609/epoche`.
-3. Vercel automatically configures:
-   * **Framework Preset:** `Vite`
-   * **Build Command:** `npm run build`
-   * **Output Directory:** `dist`
-4. Click **Deploy** for a permanent, free `epoche.vercel.app` production deployment with global CDN and SSL.
+Or deploy instantly via the Vercel Dashboard:
+1. Import repository: [`sepas1609/epoche`](https://github.com/sepas1609/epoche).
+2. Framework Preset: **Vite**.
+3. Output Directory: **`dist`**.
+4. Click **Deploy**.
 
 ---
 
-## 🔒 Security & Privacy Model
+## 📄 Citation
 
-Epoché operates under an absolute **Zero-Knowledge invariant**:
-* **Client-Only Persistence**: All data is stored in the browser's origin-isolated `localStorage` and `IndexedDB`.
-* **No Telemetry Leakage**: No user manuscripts, research hypotheses, or reviewer critiques are transmitted to external analytics or LLM servers.
-* **Portable Vaults**: Research data leaves your machine only when you explicitly export an `.epoche` vault file.
+If you use **Epoché** in your academic research laboratory or university department, please consider citing this project:
+
+```bibtex
+@software{boddu2026epoche,
+  author       = {Boddu, Saran and Open Research Community},
+  title        = {Epoché: The Local-First Academic Submission Command, Peer-Review War Room and Anti-Amnesia Hub},
+  year         = {2026},
+  publisher    = {GitHub},
+  journal      = {GitHub repository},
+  howpublished = {\url{https://github.com/sepas1609/epoche}},
+  version      = {1.0.0}
+}
+```
 
 ---
 
-## 📄 License & Attribution
+## 📜 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
-Developed with ❤️ for academic researchers, graduate scholars, and interdisciplinary scientific teams worldwide.
+Developed with ❤️ by **[Saran Boddu](https://github.com/sepas1609)** for researchers, graduate scholars, and interdisciplinary academic teams worldwide.
