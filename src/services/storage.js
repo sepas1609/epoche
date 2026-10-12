@@ -6,24 +6,24 @@
 
 import { INITIAL_PAPERS } from '../data/seedData.js';
 
-const STORAGE_KEY = 'epoche_lab_papers_v2';
+const STORAGE_KEY = 'epoche_user_submissions_v1';
 const SPRINT_KEY = 'epoche_sprint_state';
 
 export class StorageService {
   /**
-   * Load papers from local storage, initializing with seed data if first launch
+   * Load user papers from local storage.
+   * STRICT REALITY CHECK: Returns EMPTY ARRAY [] if user has not entered submissions yet!
    */
   static getPapers() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
-        this.savePapers(INITIAL_PAPERS);
-        return [...INITIAL_PAPERS];
+        return []; // Clean empty slate until user inputs submissions!
       }
       return JSON.parse(raw);
     } catch (e) {
-      console.warn("Storage read error, using memory fallback", e);
-      return [...INITIAL_PAPERS];
+      console.warn("Storage read error", e);
+      return [];
     }
   }
 
@@ -64,9 +64,17 @@ export class StorageService {
   }
 
   /**
-   * Reset to default verified sample benchmark
+   * Wipe all papers (useful for clean slate or developer tests)
    */
-  static resetToDemo() {
+  static clearAllPapers() {
+    localStorage.removeItem(STORAGE_KEY);
+    return [];
+  }
+
+  /**
+   * Explicitly load benchmark test data (Only on manual user/dev request)
+   */
+  static loadBenchmarkDemoPapers() {
     this.savePapers(INITIAL_PAPERS);
     return [...INITIAL_PAPERS];
   }
@@ -113,7 +121,6 @@ export class StorageService {
 
   /**
    * Generate RFC 5545 compliant iCalendar (.ics) export
-   * Syncs deadlines directly with Google Calendar / Apple Calendar
    */
   static exportICalendar() {
     const papers = this.getPapers();
@@ -171,8 +178,26 @@ export class StorageService {
   }
 
   /**
-   * Save sprint scratchpad notes
+   * Developer Telemetry: Calculate storage consumption
    */
+  static getStorageTelemetry() {
+    let totalBytes = 0;
+    const details = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      const val = localStorage.getItem(key);
+      const bytes = (key.length + val.length) * 2; // UTF-16
+      totalBytes += bytes;
+      details[key] = { bytes, kb: (bytes / 1024).toFixed(2) };
+    }
+    return {
+      totalBytes,
+      totalKb: (totalBytes / 1024).toFixed(2),
+      details,
+      paperCount: this.getPapers().length
+    };
+  }
+
   static getSprintNotes() {
     return localStorage.getItem('epoche_sprint_notes') || '';
   }

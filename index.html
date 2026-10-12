@@ -30,9 +30,9 @@
           <div class="brand-title-row">
             <h1 class="brand-title">Epoché</h1>
             <span class="brand-transliteration">/ Ἐποχή /</span>
-            <span class="version-tag">v2.4 Zero-Knowledge</span>
+            <span class="version-tag">v2.5 Zero-Knowledge</span>
           </div>
-          <p class="brand-subtitle">The Academic Submission Command & Peer-Review War Room</p>
+          <p class="brand-subtitle">Academic Submission Command & Peer-Review War Room</p>
         </div>
       </div>
 
@@ -42,7 +42,7 @@
           <span class="metric-icon">📑</span>
           <div class="metric-info">
             <span class="metric-val" id="metric-total-papers">0</span>
-            <span class="metric-lbl">In Pipeline</span>
+            <span class="metric-lbl">Submissions</span>
           </div>
         </div>
         <div class="pulse-divider"></div>
@@ -54,11 +54,11 @@
           </div>
         </div>
         <div class="pulse-divider"></div>
-        <div class="pulse-metric urgent" id="metric-urgent-box" title="Revisions or Camera-Ready deadlines approaching!">
+        <div class="pulse-metric urgent" id="metric-urgent-box" title="Active revision or camera-ready deadlines">
           <span class="metric-icon pulse-alarm">🚨</span>
           <div class="metric-info">
             <span class="metric-val" id="metric-urgent-deadlines">0</span>
-            <span class="metric-lbl">Active Deadlines</span>
+            <span class="metric-lbl">Deadlines</span>
           </div>
         </div>
         <div class="pulse-divider"></div>
@@ -71,29 +71,39 @@
         </div>
       </div>
 
-      <!-- Header Action Controls -->
+      <!-- Header Action Controls & User Account Pill -->
       <div class="header-actions">
         <!-- Zero-Knowledge Security Badge -->
-        <div class="privacy-badge" title="Zero-Knowledge Architecture: All manuscripts, reviewer notes, and code keys stay 100% on your device's browser memory (IndexedDB). Zero external server tracking.">
-          <svg class="privacy-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="privacy-badge" title="Zero-Knowledge Architecture: All manuscripts, reviewer notes, and code keys stay strictly in your browser memory (IndexedDB). Zero cloud tracking.">
+          <svg class="privacy-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             <path d="M9 12l2 2 4-4"/>
           </svg>
           <span>Client-Only Vault</span>
         </div>
 
-        <button class="btn btn-outline" id="btn-export-ical" title="Export all paper deadlines into your Google or Apple Calendar">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <!-- Role & User Profile Switcher -->
+        <div class="user-profile-badge" id="btn-user-profile" title="Click to switch role or account">
+          <span class="user-role-icon" id="user-role-icon">🎓</span>
+          <div class="user-meta">
+            <span class="user-name-display" id="user-name-display">Client (Researcher)</span>
+            <span class="user-role-label" id="user-role-label">Saran Boddu</span>
+          </div>
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <button class="btn btn-outline btn-sm" id="btn-export-ical" title="Export all deadlines into Google / Apple Calendar">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>iCal Sync</span>
         </button>
 
-        <button class="btn btn-outline" id="btn-vault-manager" title="Export encrypted lab vault or import backup">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Lab Vault</span>
+        <button class="btn btn-outline btn-sm" id="btn-vault-manager" title="Export or restore encrypted lab vault">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Vault</span>
         </button>
 
-        <button class="btn btn-primary" id="btn-new-paper">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <button class="btn btn-primary btn-sm" id="btn-new-paper">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span>New Submission</span>
         </button>
       </div>
@@ -125,12 +135,19 @@
           <span class="tab-icon">🍅</span>
           <span class="tab-title">Revision Sprint</span>
         </button>
+
+        <!-- Developer Mode Tab (Toggled via Role) -->
+        <button class="nav-tab dev-tab hidden" data-tab="tab-developer" id="nav-tab-developer">
+          <span class="tab-icon">🛠️</span>
+          <span class="tab-title">Developer Console</span>
+          <span class="tab-badge dev-badge">Admin</span>
+        </button>
       </div>
 
       <!-- Quick Search & Filter Controls -->
       <div class="nav-filters">
         <div class="search-input-wrapper">
-          <svg class="search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg class="search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" id="filter-search" placeholder="Search papers, authors, journals, IDs..." autocomplete="off">
         </div>
         <select id="filter-publisher" class="filter-select">
@@ -145,27 +162,6 @@
       </div>
     </nav>
 
-    <!-- Hero Spotlight Banner -->
-    <section class="hero-strip" id="hero-strip">
-      <div class="hero-strip-content">
-        <div class="hero-strip-badge">GEN-Z ANTI-AMNESIA COGNITIVE SHIELD</div>
-        <h2>Never let a 60-day review silence bury your research momentum.</h2>
-        <p>Dissect harsh reviewer critiques into collaborative author tasks, anchor exact code/commit checkpoints, and track review countdowns without trusting your research to cloud servers.</p>
-        <div class="hero-action-buttons">
-          <button class="btn btn-sm btn-accent" id="hero-btn-dissect">
-            <span>⚡ Dissect Reviewer Feedback</span>
-          </button>
-          <button class="btn btn-sm btn-ghost" id="hero-btn-demo">
-            <span>🔄 Reload Verified Lab Benchmark Demo</span>
-          </button>
-        </div>
-      </div>
-      <div class="hero-strip-visual">
-        <img src="/hero-banner.jpg" alt="Epoché Command Center" class="hero-img-preview" />
-      </div>
-      <button class="btn-dismiss-hero" id="btn-dismiss-hero" title="Dismiss banner">✕</button>
-    </section>
-
     <!-- Main Content Area -->
     <main class="main-content">
       <!-- ================= TAB 1: MISSION CONTROL & PIPELINE ================= -->
@@ -173,31 +169,24 @@
         <div class="pipeline-toolbar">
           <div class="view-mode-toggle">
             <button class="view-btn active" data-view="kanban" id="btn-view-kanban">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/></svg>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/></svg>
               <span>Kanban Board</span>
             </button>
             <button class="view-btn" data-view="timeline" id="btn-view-timeline">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></svg>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></svg>
               <span>Deadlines Radar</span>
             </button>
           </div>
           <div class="pipeline-info-chips">
-            <span class="chip chip-neutral"><span class="dot dot-cyan"></span> Auto-syncing locally</span>
-            <span class="chip chip-amber"><span class="dot dot-amber"></span> 180s review pulse active</span>
+            <span class="chip chip-neutral" id="pipeline-user-chip"><span class="dot dot-cyan"></span> Mode: Client (Researcher)</span>
+            <span class="chip chip-neutral"><span class="dot dot-cyan"></span> 100% Client-Side Memory</span>
           </div>
         </div>
 
         <!-- Kanban Board Container -->
         <div class="kanban-board-container" id="kanban-view">
           <div class="kanban-board" id="kanban-board">
-            <!-- Columns dynamically rendered by main.js:
-                 1. Drafting & Prep
-                 2. Submitted & Queued
-                 3. Under Review (Ticking)
-                 4. Revision War Room (Urgent)
-                 5. Camera-Ready & Proofs
-                 6. Accepted & Published
-            -->
+            <!-- Dynamically populated or rendered with clean empty state -->
           </div>
         </div>
 
@@ -205,7 +194,7 @@
         <div class="timeline-view-container hidden" id="timeline-view">
           <div class="radar-card-header">
             <h3>⏳ Chronological Deadline Radar & Latency Estimator</h3>
-            <p>Calculates standard publisher peer-review cycle times versus your active submission days to identify when to send editor inquiry letters.</p>
+            <p>Calculates standard publisher peer-review cycle times versus your active submission days.</p>
           </div>
           <div class="timeline-cards-list" id="timeline-cards-list">
             <!-- Rendered dynamically -->
@@ -215,7 +204,7 @@
 
       <!-- ================= TAB 2: REBUTTAL WAR ROOM ================= -->
       <section class="tab-pane" id="tab-rebuttal">
-        <div class="rebuttal-container">
+        <div class="rebuttal-container" id="rebuttal-container-content">
           <!-- Left: Paper selector & Raw feedback paste area -->
           <div class="rebuttal-sidebar">
             <div class="panel-box">
@@ -326,7 +315,7 @@ Reviewer #2:
                 </div>
 
                 <div class="portals-directory-grid" id="portals-directory-grid">
-                  <!-- Rendered dynamically from seedData portals -->
+                  <!-- Rendered dynamically -->
                 </div>
               </div>
             </div>
@@ -449,10 +438,139 @@ Reviewer #2:
           </div>
         </div>
       </section>
+
+      <!-- ================= TAB 6: DEVELOPER CONSOLE (DEV ROLE ONLY) ================= -->
+      <section class="tab-pane" id="tab-developer">
+        <div class="dev-console-container">
+          <div class="dev-header">
+            <div>
+              <span class="badge-pill accent">DEVELOPER ROOT DASHBOARD</span>
+              <h2>🛠️ System Diagnostics & Lab Testbench</h2>
+              <p>Platform monitoring, storage telemetry, mock test dataset injector, and diagnostic engines.</p>
+            </div>
+            <div class="dev-quick-actions">
+              <button class="btn btn-outline btn-sm" id="dev-btn-export-telemetry">📊 Export Diagnostic Report</button>
+              <button class="btn btn-accent btn-sm" id="dev-btn-inject-benchmark">⚡ Inject Verified Benchmark Data</button>
+              <button class="btn btn-outline btn-sm" style="color: var(--rose-light);" id="dev-btn-purge-storage">🗑️ Purge All Submissions</button>
+            </div>
+          </div>
+
+          <div class="dev-grid">
+            <!-- Telemetry Card -->
+            <div class="section-card">
+              <div class="section-card-title">
+                <div class="card-title-icon">💾</div>
+                <div>
+                  <h3>Client Storage Telemetry</h3>
+                  <p>Real-time LocalStorage / IndexedDB byte consumption</p>
+                </div>
+              </div>
+              <div class="telemetry-stats-grid" id="dev-telemetry-grid">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Session & Auth Inspector -->
+            <div class="section-card">
+              <div class="section-card-title">
+                <div class="card-title-icon">🔑</div>
+                <div>
+                  <h3>Active Session Inspector</h3>
+                  <p>Role authorization tokens and permission scopes</p>
+                </div>
+              </div>
+              <div class="auth-inspector-box" id="dev-auth-inspector">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Live Raw JSON Database Viewer -->
+            <div class="section-card span-2">
+              <div class="section-card-title" style="justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="card-title-icon">📄</div>
+                  <div>
+                    <h3>Raw Submissions JSON Ledger</h3>
+                    <p>Live read/write view of local submissions database</p>
+                  </div>
+                </div>
+                <button class="btn btn-xs btn-outline" id="dev-btn-copy-json">📋 Copy Raw JSON</button>
+              </div>
+              <textarea id="dev-raw-json-viewer" class="dev-json-textarea" readonly></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- Modals -->
-    <!-- 1. Paper Details & Edit Modal -->
+    <!-- 1. Authentication & Role Switcher Modal -->
+    <div class="modal-backdrop hidden" id="modal-auth">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="badge-pill accent">AUTHENTICATION & ROLE SELECTOR</span>
+            <h3>Access Epoché System</h3>
+          </div>
+          <button class="modal-close-btn" id="btn-close-auth-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="auth-role-tabs">
+            <button class="auth-role-btn active" id="btn-auth-tab-client">
+              <span class="auth-icon">🎓</span>
+              <strong>Client / Researcher</strong>
+              <small>Student, Professor, Research Team</small>
+            </button>
+            <button class="auth-role-btn" id="btn-auth-tab-dev">
+              <span class="auth-icon">💻</span>
+              <strong>Developer / Admin</strong>
+              <small>System Engineering, Diagnostics</small>
+            </button>
+          </div>
+
+          <!-- Client Login Form -->
+          <form id="form-auth-client" class="app-form auth-form-pane">
+            <div class="form-group">
+              <label class="form-label" for="auth-client-name">Researcher Name *</label>
+              <input type="text" id="auth-client-name" class="form-input" required value="Saran Boddu">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="auth-client-email">Academic Email *</label>
+              <input type="email" id="auth-client-email" class="form-input" required value="saran@amrita.edu">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="auth-client-inst">Institution / University</label>
+              <input type="text" id="auth-client-inst" class="form-input" value="Amrita Vishwa Vidyapeetham">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="auth-client-domain">Research Domain / Department</label>
+              <input type="text" id="auth-client-domain" class="form-input" value="Power Electronics & Microgrids">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary btn-block">Log In as Researcher (Client)</button>
+            </div>
+          </form>
+
+          <!-- Developer Login Form -->
+          <form id="form-auth-dev" class="app-form auth-form-pane hidden">
+            <div class="form-group">
+              <label class="form-label" for="auth-dev-name">Developer / Engineer Name *</label>
+              <input type="text" id="auth-dev-name" class="form-input" required value="Saran Boddu (Lead Dev)">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="auth-dev-pass">Developer Access Passcode *</label>
+              <input type="password" id="auth-dev-pass" class="form-input" required value="dev123" placeholder="Enter developer key (Default: dev123)">
+              <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Default key is <code>dev123</code></small>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-accent btn-block">Unlock Developer Admin Mode</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Paper Details & Edit Modal -->
     <div class="modal-backdrop hidden" id="modal-paper-details">
       <div class="modal-dialog modal-dialog-lg">
         <div class="modal-header">
@@ -468,13 +586,13 @@ Reviewer #2:
       </div>
     </div>
 
-    <!-- 2. New Paper Modal -->
+    <!-- 3. New Paper Modal -->
     <div class="modal-backdrop hidden" id="modal-new-paper">
       <div class="modal-dialog modal-dialog-lg">
         <div class="modal-header">
           <div class="modal-title-group">
             <span class="badge-pill accent">NEW SUBMISSION</span>
-            <h3>Add Paper to Epoché Command</h3>
+            <h3>Register Manuscript into Epoché</h3>
           </div>
           <button class="modal-close-btn" id="btn-close-new-paper-modal">✕</button>
         </div>
@@ -555,14 +673,14 @@ Reviewer #2:
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-ghost" id="btn-cancel-new-paper">Cancel</button>
-              <button type="submit" class="btn btn-primary">Save to Command</button>
+              <button type="submit" class="btn btn-primary">Save Submission</button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- 3. Lab Vault Modal (Backup & Restore) -->
+    <!-- 4. Lab Vault Modal (Backup & Restore) -->
     <div class="modal-backdrop hidden" id="modal-vault">
       <div class="modal-dialog">
         <div class="modal-header">
@@ -593,7 +711,7 @@ Reviewer #2:
       </div>
     </div>
 
-    <!-- 4. Rebuttal Letter Print Preview Modal -->
+    <!-- 5. Rebuttal Letter Print Preview Modal -->
     <div class="modal-backdrop hidden" id="modal-rebuttal-preview">
       <div class="modal-dialog modal-dialog-lg">
         <div class="modal-header">

@@ -1,9 +1,10 @@
 /**
  * Epoché (Ἐποχή) — Academic Research Command & Peer-Review War Room
- * Main Application Controller
+ * Main Application Controller (v2.5 Role-Based & Strict Client Reality)
  */
 
 import { StorageService } from './services/storage.js';
+import { AuthService } from './services/auth.js';
 import { ReviewerParser } from './services/parser.js';
 import { RebuttalGenerator } from './services/rebuttalGenerator.js';
 import { InquiryTemplates } from './services/inquiryTemplates.js';
@@ -12,28 +13,80 @@ import { GLOBAL_PORTALS, SAMPLE_RAW_REVIEWS } from './data/seedData.js';
 
 class EpocheApp {
   constructor() {
+    // Initialize or restore session
+    this.currentUser = AuthService.getSession();
+    if (!this.currentUser) {
+      this.currentUser = AuthService.loginClient({
+        name: "Saran Boddu",
+        email: "saran@amrita.edu",
+        institution: "Amrita Vishwa Vidyapeetham",
+        domain: "Power Electronics & Renewable Energy"
+      });
+    }
+
+    // Load papers strictly from user's storage (Default is empty [] if none entered)
     this.papers = StorageService.getPapers();
     this.activeTab = 'tab-pipeline';
     this.selectedRebuttalPaperId = this.papers[0]?.id || null;
     this.currentReviewerFilter = 'all';
 
     // Pomodoro Sprint State
-    this.timerDuration = 25 * 60; // seconds
+    this.timerDuration = 25 * 60;
     this.timerRemaining = 25 * 60;
     this.timerRunning = false;
     this.timerInterval = null;
     this.sprintPhase = 1;
 
     // View state
-    this.activePipelineView = 'kanban'; // 'kanban' or 'timeline'
+    this.activePipelineView = 'kanban';
 
     this.init();
   }
 
   init() {
     this.bindEvents();
+    this.syncUserRoleUI();
     this.renderAll();
     this.startGlobalTimerLoop();
+  }
+
+  // =========================================================================
+  // Role & Authentication UI Sync
+  // =========================================================================
+  syncUserRoleUI() {
+    const isDev = this.currentUser.role === 'developer';
+    const profilePill = document.getElementById('btn-user-profile');
+    const nameDisplay = document.getElementById('user-name-display');
+    const roleLabel = document.getElementById('user-role-label');
+    const roleIcon = document.getElementById('user-role-icon');
+    const devTab = document.getElementById('nav-tab-developer');
+    const modeChip = document.getElementById('pipeline-user-chip');
+
+    if (profilePill) {
+      profilePill.classList.toggle('role-dev', isDev);
+    }
+
+    if (nameDisplay) {
+      nameDisplay.textContent = isDev ? "Developer (Admin)" : "Client (Researcher)";
+    }
+
+    if (roleLabel) {
+      roleLabel.textContent = this.currentUser.name;
+    }
+
+    if (roleIcon) {
+      roleIcon.textContent = isDev ? "💻" : "🎓";
+    }
+
+    if (devTab) {
+      devTab.classList.toggle('hidden', !isDev);
+    }
+
+    if (modeChip) {
+      modeChip.innerHTML = isDev 
+        ? `<span class="dot dot-amber"></span> Mode: Developer (Admin Root)` 
+        : `<span class="dot dot-cyan"></span> Mode: Researcher Client (${this.currentUser.name})`;
+    }
   }
 
   // =========================================================================
@@ -60,6 +113,62 @@ class EpocheApp {
     document.getElementById('filter-search')?.addEventListener('input', () => this.renderPipeline());
     document.getElementById('filter-publisher')?.addEventListener('change', () => this.renderPipeline());
 
+    // User Profile Pill -> Open Auth Modal
+    document.getElementById('btn-user-profile')?.addEventListener('click', () => {
+      this.openModal('modal-auth');
+    });
+    document.getElementById('btn-close-auth-modal')?.addEventListener('click', () => {
+      this.closeModal('modal-auth');
+    });
+
+    // Auth Modal Role Tabs
+    document.getElementById('btn-auth-tab-client')?.addEventListener('click', () => {
+      document.getElementById('btn-auth-tab-client').classList.add('active');
+      document.getElementById('btn-auth-tab-dev').classList.remove('active');
+      document.getElementById('form-auth-client').classList.remove('hidden');
+      document.getElementById('form-auth-dev').classList.add('hidden');
+    });
+
+    document.getElementById('btn-auth-tab-dev')?.addEventListener('click', () => {
+      document.getElementById('btn-auth-tab-dev').classList.add('active');
+      document.getElementById('btn-auth-tab-client').classList.remove('active');
+      document.getElementById('form-auth-dev').classList.remove('hidden');
+      document.getElementById('form-auth-client').classList.add('hidden');
+    });
+
+    // Client Login Submit
+    document.getElementById('form-auth-client')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('auth-client-name').value;
+      const email = document.getElementById('auth-client-email').value;
+      const institution = document.getElementById('auth-client-inst').value;
+      const domain = document.getElementById('auth-client-domain').value;
+
+      this.currentUser = AuthService.loginClient({ name, email, institution, domain });
+      this.syncUserRoleUI();
+      this.closeModal('modal-auth');
+      this.showToast(`Logged in as Researcher: ${this.currentUser.name}`, 'success');
+      this.renderAll();
+    });
+
+    // Developer Login Submit
+    document.getElementById('form-auth-dev')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('auth-dev-name').value;
+      const pass = document.getElementById('auth-dev-pass').value;
+
+      if (pass !== 'dev123' && pass.trim().length === 0) {
+        this.showToast('Invalid Developer Passcode. Use "dev123"', 'error');
+        return;
+      }
+
+      this.currentUser = AuthService.loginDeveloper({ name });
+      this.syncUserRoleUI();
+      this.closeModal('modal-auth');
+      this.showToast(`Developer Console Unlocked for ${this.currentUser.name}!`, 'success');
+      this.switchTab('tab-developer');
+    });
+
     // Hero Strip actions
     document.getElementById('btn-dismiss-hero')?.addEventListener('click', () => {
       document.getElementById('hero-strip').classList.add('hidden');
@@ -68,11 +177,15 @@ class EpocheApp {
       this.switchTab('tab-rebuttal');
     });
     document.getElementById('hero-btn-demo')?.addEventListener('click', () => {
-      this.resetDemo();
+      this.loadBenchmarkDemo();
     });
 
     // Global Action Buttons
     document.getElementById('btn-export-ical')?.addEventListener('click', () => {
+      if (this.papers.length === 0) {
+        this.showToast('No active submissions to export. Add a paper first.', 'info');
+        return;
+      }
       StorageService.exportICalendar();
       this.showToast('iCalendar (.ics) downloaded! Sync with Google/Apple Calendar.', 'success');
     });
@@ -101,6 +214,7 @@ class EpocheApp {
           const res = StorageService.importVault(evt.target.result);
           if (res.success) {
             this.papers = StorageService.getPapers();
+            this.selectedRebuttalPaperId = this.papers[0]?.id || null;
             this.renderAll();
             this.closeModal('modal-vault');
             this.showToast(`Imported ${res.count} research manuscripts from vault!`, 'success');
@@ -232,6 +346,40 @@ class EpocheApp {
       });
     }
 
+    // Developer Console Actions
+    document.getElementById('dev-btn-inject-benchmark')?.addEventListener('click', () => {
+      this.loadBenchmarkDemo();
+    });
+
+    document.getElementById('dev-btn-purge-storage')?.addEventListener('click', () => {
+      if (confirm("Are you sure you want to purge all submissions? This resets storage to a clean slate.")) {
+        this.papers = StorageService.clearAllPapers();
+        this.selectedRebuttalPaperId = null;
+        this.renderAll();
+        this.showToast("All submissions purged. Clean slate active.", "info");
+      }
+    });
+
+    document.getElementById('dev-btn-export-telemetry')?.addEventListener('click', () => {
+      const tel = StorageService.getStorageTelemetry();
+      const blob = new Blob([JSON.stringify(tel, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `epoche_telemetry_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      this.showToast("Telemetry diagnostic report exported!", "success");
+    });
+
+    document.getElementById('dev-btn-copy-json')?.addEventListener('click', () => {
+      const txt = document.getElementById('dev-raw-json-viewer')?.value;
+      if (txt) {
+        navigator.clipboard.writeText(txt);
+        this.showToast("Raw JSON copied to clipboard!", "success");
+      }
+    });
+
     // Modal backdrop click to close
     document.querySelectorAll('.modal-backdrop').forEach(modal => {
       modal.addEventListener('click', (e) => {
@@ -258,6 +406,7 @@ class EpocheApp {
     if (tabId === 'tab-rebuttal') this.renderRebuttalSection();
     if (tabId === 'tab-oracle') this.renderOracleSection();
     if (tabId === 'tab-capsule') this.renderMemoryCapsules();
+    if (tabId === 'tab-developer') this.renderDeveloperConsole();
   }
 
   switchPipelineView(viewName) {
@@ -285,11 +434,13 @@ class EpocheApp {
     this.renderOracleSection();
     this.renderMemoryCapsules();
     this.updateBadges();
+    if (this.currentUser.role === 'developer') {
+      this.renderDeveloperConsole();
+    }
   }
 
   updateBadges() {
     const pipelineCount = this.papers.length;
-    const underReview = this.papers.filter(p => p.stage === 'under_review').length;
     const rebuttalActive = this.papers.filter(p => p.stage === 'revision_war_room').length;
 
     const bPipeline = document.getElementById('tab-badge-pipeline');
@@ -335,6 +486,31 @@ class EpocheApp {
     const board = document.getElementById('kanban-board');
     if (!board) return;
 
+    // STRICT REALITY: If user has 0 papers, render the welcoming Empty Slate
+    if (this.papers.length === 0) {
+      board.innerHTML = `
+        <div class="empty-pipeline-slate">
+          <div class="empty-slate-icon">📑</div>
+          <h3 class="empty-slate-title">Your Research Pipeline is Clean</h3>
+          <p class="empty-slate-desc">
+            No papers have been entered yet. Epoché respects your academic privacy: zero fake submissions are stored on this device until you register them.
+          </p>
+          <div class="empty-slate-actions">
+            <button class="btn btn-primary" onclick="window.epoche.openModal('modal-new-paper')">
+              + Register Your First Submission
+            </button>
+            <button class="btn btn-outline" onclick="window.epoche.openModal('modal-vault')">
+              📥 Import .epoche Vault
+            </button>
+          </div>
+          <button class="demo-benchmark-link" onclick="window.epoche.loadBenchmarkDemo()">
+            Want to test features first? Click here to load 3 sample benchmark papers (IEEE, Elsevier, ACM)
+          </button>
+        </div>
+      `;
+      return;
+    }
+
     const searchQuery = (document.getElementById('filter-search')?.value || '').toLowerCase();
     const publisherFilter = document.getElementById('filter-publisher')?.value || 'all';
 
@@ -373,7 +549,9 @@ class EpocheApp {
           <span class="column-count">${colPapers.length}</span>
         </div>
         <div class="kanban-column-cards" data-stage="${col.id}">
-          ${colPapers.map(p => this.createPaperCardHTML(p)).join('')}
+          ${colPapers.length > 0 
+            ? colPapers.map(p => this.createPaperCardHTML(p)).join('')
+            : `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 11px;">No papers in this stage</div>`}
         </div>
       `;
 
@@ -392,7 +570,6 @@ class EpocheApp {
   createPaperCardHTML(p) {
     const isUrgent = this.isUrgentDeadline(p.deadline);
     const timingHTML = this.calculateTimingDisplay(p);
-    const leadAuthor = p.authors.find(a => a.isLead) || p.authors[0];
 
     const commentsTotal = p.reviewerComments?.length || 0;
     const commentsApproved = p.reviewerComments?.filter(c => c.status === 'approved').length || 0;
@@ -490,6 +667,15 @@ class EpocheApp {
     const container = document.getElementById('timeline-cards-list');
     if (!container) return;
 
+    if (this.papers.length === 0) {
+      container.innerHTML = `
+        <div class="empty-pipeline-slate">
+          <p>No manuscripts to display on the deadline radar. Register a submission to track cycle times.</p>
+        </div>
+      `;
+      return;
+    }
+
     const underReviewOrActive = this.papers.filter(p => p.stage !== 'drafting');
 
     container.innerHTML = underReviewOrActive.map(p => {
@@ -551,8 +737,29 @@ class EpocheApp {
   // Tab 2: Rebuttal War Room & Comment Dissector
   // =========================================================================
   renderRebuttalSection() {
-    // Populate paper selector
     const select = document.getElementById('rebuttal-paper-select');
+
+    if (this.papers.length === 0) {
+      if (select) {
+        select.innerHTML = `<option value="">No papers registered yet</option>`;
+      }
+      const titleEl = document.getElementById('rebuttal-paper-title-display');
+      if (titleEl) titleEl.textContent = "No Submissions Registered Yet";
+
+      const list = document.getElementById('comments-card-list');
+      if (list) {
+        list.innerHTML = `
+          <div class="empty-pipeline-slate" style="padding: 40px 20px;">
+            <div class="empty-slate-icon">⚔️</div>
+            <h4>Rebuttal Room Awaiting Submissions</h4>
+            <p>Register your manuscript to parse reviewer feedback, delegate tasks to co-authors, and generate response letters.</p>
+            <button class="btn btn-primary btn-sm" onclick="window.epoche.openModal('modal-new-paper')">+ Register Submission</button>
+          </div>
+        `;
+      }
+      return;
+    }
+
     if (select) {
       select.innerHTML = this.papers.map(p => `
         <option value="${p.id}" ${p.id === this.selectedRebuttalPaperId ? 'selected' : ''}>
@@ -564,11 +771,11 @@ class EpocheApp {
     const currentPaper = this.papers.find(p => p.id === this.selectedRebuttalPaperId) || this.papers[0];
     if (!currentPaper) return;
 
-    // Header title
+    this.selectedRebuttalPaperId = currentPaper.id;
+
     const titleEl = document.getElementById('rebuttal-paper-title-display');
     if (titleEl) titleEl.textContent = currentPaper.title;
 
-    // Progress stats
     const comments = currentPaper.reviewerComments || [];
     const total = comments.length;
     const resolved = comments.filter(c => c.status === 'approved').length;
@@ -594,7 +801,6 @@ class EpocheApp {
       }
     }
 
-    // Render Comment Cards
     this.renderCommentCards(currentPaper);
   }
 
@@ -610,7 +816,7 @@ class EpocheApp {
     if (comments.length === 0) {
       list.innerHTML = `
         <div style="text-align: center; padding: 40px; color: var(--text-muted); background: var(--bg-surface-elevated); border-radius: var(--radius-md);">
-          <p style="font-size: 16px; margin-bottom: 8px;">No reviewer comments currently recorded for this paper.</p>
+          <p style="font-size: 15px; margin-bottom: 8px;">No reviewer comments recorded for this paper.</p>
           <p style="font-size: 12px;">Paste your raw review email in the left box and click <strong>"Parse & Distribute"</strong> to auto-generate the action matrix.</p>
         </div>
       `;
@@ -663,7 +869,7 @@ class EpocheApp {
       </div>
     `).join('');
 
-    // Attach listeners for live changes
+    // Attach listeners
     list.querySelectorAll('.comment-response-textarea').forEach(tx => {
       tx.addEventListener('change', (e) => {
         this.updateCommentField(paper.id, e.target.dataset.commentId, 'response', e.target.value);
@@ -696,12 +902,11 @@ class EpocheApp {
     });
 
     list.querySelectorAll('.btn-delete-comment').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         this.deleteComment(paper.id, btn.dataset.commentId);
       });
     });
 
-    // Reviewer filter buttons
     document.querySelectorAll('.comment-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.comment-filter-btn').forEach(b => b.classList.remove('active'));
@@ -739,7 +944,10 @@ class EpocheApp {
     }
 
     const paper = this.papers.find(p => p.id === this.selectedRebuttalPaperId);
-    if (!paper) return;
+    if (!paper) {
+      this.showToast('Please select or register a paper first.', 'error');
+      return;
+    }
 
     const parsed = ReviewerParser.dissect(rawText, paper.authors);
     if (parsed.length === 0) {
@@ -754,13 +962,15 @@ class EpocheApp {
     this.renderPipeline();
     this.showToast(`⚡ Dissected and created ${parsed.length} actionable cards!`, 'success');
 
-    // Clear textarea
     document.getElementById('raw-review-input').value = '';
   }
 
   handleAddCustomComment() {
     const paper = this.papers.find(p => p.id === this.selectedRebuttalPaperId);
-    if (!paper) return;
+    if (!paper) {
+      this.showToast('Please select or create a submission first.', 'error');
+      return;
+    }
 
     const newComment = {
       id: `c-custom-${Date.now()}`,
@@ -858,12 +1068,15 @@ class EpocheApp {
       `).join('');
     }
 
-    // Populate Inquiry paper selector
     const paperSelect = document.getElementById('inquiry-paper-select');
     if (paperSelect) {
-      paperSelect.innerHTML = this.papers.map(p => `
-        <option value="${p.id}">${p.title} (${p.trackingId || 'No ID'})</option>
-      `).join('');
+      if (this.papers.length === 0) {
+        paperSelect.innerHTML = `<option value="">No registered papers</option>`;
+      } else {
+        paperSelect.innerHTML = this.papers.map(p => `
+          <option value="${p.id}">${p.title} (${p.trackingId || 'No ID'})</option>
+        `).join('');
+      }
     }
 
     this.updateInquiryLetter();
@@ -885,6 +1098,18 @@ class EpocheApp {
   renderMemoryCapsules(searchFilter = '') {
     const grid = document.getElementById('capsules-grid');
     if (!grid) return;
+
+    if (this.papers.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-pipeline-slate" style="grid-column: 1 / -1;">
+          <div class="empty-slate-icon">🧠</div>
+          <h3>No Memory Capsules Saved</h3>
+          <p>Memory Capsules anchor Overleaf URLs, Git commits, and experiment setups so you never suffer from post-submission amnesia.</p>
+          <button class="btn btn-primary btn-sm" onclick="window.epoche.openModal('modal-new-paper')">+ Create Submission</button>
+        </div>
+      `;
+      return;
+    }
 
     const q = searchFilter.toLowerCase();
     const filtered = this.papers.filter(p => {
@@ -994,12 +1219,55 @@ class EpocheApp {
     const display = document.getElementById('timer-display');
     if (display) display.textContent = str;
 
-    // Update ring SVG
     const ring = document.getElementById('timer-progress-ring');
     if (ring) {
-      const circumference = 2 * Math.PI * 90; // ~565.48
+      const circumference = 2 * Math.PI * 90;
       const progress = 1 - (this.timerRemaining / this.timerDuration);
       ring.style.strokeDashoffset = circumference * progress;
+    }
+  }
+
+  // =========================================================================
+  // Tab 6: Developer Console (Admin Diagnostics)
+  // =========================================================================
+  renderDeveloperConsole() {
+    const telemetry = StorageService.getStorageTelemetry();
+
+    // Telemetry Grid
+    const telGrid = document.getElementById('dev-telemetry-grid');
+    if (telGrid) {
+      telGrid.innerHTML = `
+        <div class="telemetry-item">
+          <span class="telemetry-val">${telemetry.paperCount}</span>
+          <span class="telemetry-lbl">Active Submissions</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-val">${telemetry.totalKb} KB</span>
+          <span class="telemetry-lbl">Local Storage Footprint</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-val">0.00 KB</span>
+          <span class="telemetry-lbl">Cloud Leakage (Zero)</span>
+        </div>
+      `;
+    }
+
+    // Session inspector
+    const authBox = document.getElementById('dev-auth-inspector');
+    if (authBox) {
+      authBox.innerHTML = `
+        <div><strong>Session ID:</strong> ${this.currentUser.id}</div>
+        <div><strong>Active Role:</strong> <span style="color: var(--violet-light); font-weight: bold;">${this.currentUser.role.toUpperCase()}</span></div>
+        <div><strong>User Name:</strong> ${this.currentUser.name}</div>
+        <div><strong>Scopes:</strong> ${(this.currentUser.permissions || []).join(', ')}</div>
+        <div><strong>Login Timestamp:</strong> ${this.currentUser.loginTime}</div>
+      `;
+    }
+
+    // Raw JSON Viewer
+    const jsonViewer = document.getElementById('dev-raw-json-viewer');
+    if (jsonViewer) {
+      jsonViewer.value = JSON.stringify(this.papers, null, 2);
     }
   }
 
@@ -1054,11 +1322,12 @@ class EpocheApp {
 
     StorageService.savePaper(newPaper);
     this.papers = StorageService.getPapers();
+    this.selectedRebuttalPaperId = newPaper.id;
     this.closeModal('modal-new-paper');
     document.getElementById('form-new-paper').reset();
 
     this.renderAll();
-    this.showToast('New manuscript added to Epoché Command!', 'success');
+    this.showToast('Manuscript registered successfully!', 'success');
   }
 
   openPaperDetailsModal(paperId) {
@@ -1193,6 +1462,7 @@ class EpocheApp {
     document.getElementById('btn-delete-paper-trigger')?.addEventListener('click', () => {
       if (confirm(`Are you sure you want to delete "${paper.title}" from Epoché Command?`)) {
         this.papers = StorageService.deletePaper(paper.id);
+        this.selectedRebuttalPaperId = this.papers[0]?.id || null;
         this.closeModal('modal-paper-details');
         this.renderAll();
         this.showToast('Paper deleted from database.', 'info');
@@ -1231,15 +1501,14 @@ class EpocheApp {
     }, 3500);
   }
 
-  resetDemo() {
-    this.papers = StorageService.resetToDemo();
+  loadBenchmarkDemo() {
+    this.papers = StorageService.loadBenchmarkDemoPapers();
     this.selectedRebuttalPaperId = this.papers[0]?.id;
     this.renderAll();
-    this.showToast('Reloaded verified benchmark lab papers & reviewer cards!', 'success');
+    this.showToast('Injected 3 verified benchmark papers (IEEE, Elsevier, ACM)!', 'success');
   }
 
   startGlobalTimerLoop() {
-    // Ticks every 60 seconds to update live countdown tags in Kanban
     setInterval(() => {
       if (this.activeTab === 'tab-pipeline') {
         this.renderPipeline();
