@@ -2225,3 +2225,28 @@ html, body {
   resize: vertical;
 }
 
+/* Card Delete Button */
+.btn-card-delete {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  opacity: 0.6;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-card-delete:hover {
+  opacity: 1;
+  background: rgba(244, 63, 94, 0.2);
+  border-color: rgba(244, 63, 94, 0.4);
+  color: var(--rose-light);
+  transform: scale(1.1);
+}
+
+

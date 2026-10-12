@@ -578,7 +578,12 @@ Reviewer #2:
             <span class="modal-status-badge" id="modal-paper-stage-badge">Under Review</span>
             <h3 id="modal-paper-title">Paper Details</h3>
           </div>
-          <button class="modal-close-btn" id="btn-close-paper-modal">✕</button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn btn-xs btn-outline" style="color: var(--rose-light); border-color: rgba(244, 63, 94, 0.4);" id="btn-modal-top-delete" title="Delete submission">
+              🗑️ Delete Paper
+            </button>
+            <button class="modal-close-btn" id="btn-close-paper-modal">✕</button>
+          </div>
         </div>
         <div class="modal-body" id="modal-paper-body">
           <!-- Dynamically filled with full paper fields & editing form -->

@@ -560,9 +560,20 @@ class EpocheApp {
 
     // Attach click handlers to cards
     board.querySelectorAll('.paper-card').forEach(card => {
-      card.addEventListener('click', () => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-card-delete')) return;
         const paperId = card.dataset.id;
         this.openPaperDetailsModal(paperId);
+      });
+    });
+
+    // Attach quick delete button handlers directly on cards
+    board.querySelectorAll('.btn-card-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const paperId = btn.dataset.paperId;
+        this.deletePaper(paperId);
       });
     });
   }
@@ -577,8 +588,11 @@ class EpocheApp {
     return `
       <div class="paper-card ${isUrgent ? 'urgent-card' : ''}" data-id="${p.id}">
         <div class="paper-card-top">
-          <span class="publisher-badge">${p.publisher || 'SCI'}</span>
-          <span class="tracking-id">${p.trackingId || 'Unassigned ID'}</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="publisher-badge">${p.publisher || 'SCI'}</span>
+            <span class="tracking-id">${p.trackingId || 'Unassigned ID'}</span>
+          </div>
+          <button class="btn-card-delete" data-paper-id="${p.id}" title="Delete this paper">🗑️</button>
         </div>
         
         <h4 class="paper-title" title="${p.title}">${p.title}</h4>
@@ -718,6 +732,9 @@ class EpocheApp {
                 ✉️ Recommended: Send Inquiry Letter
               </button>
             ` : ''}
+            <button class="btn btn-outline btn-xs" style="color: var(--rose-light); border-color: rgba(244, 63, 94, 0.4);" onclick="window.epoche.deletePaper('${p.id}')">
+              🗑️ Delete
+            </button>
           </div>
         </div>
       `;
@@ -1162,9 +1179,14 @@ class EpocheApp {
             ${cap.modelNotes || 'No specific experiment notes recorded.'}
           </div>
 
-          <button class="btn btn-outline btn-xs btn-block" onclick="window.epoche.openPaperDetailsModal('${p.id}')">
-            Edit Memory Capsule Details
-          </button>
+          <div style="display: flex; gap: 8px; margin-top: 4px;">
+            <button class="btn btn-outline btn-xs" style="flex: 1;" onclick="window.epoche.openPaperDetailsModal('${p.id}')">
+              Edit Capsule
+            </button>
+            <button class="btn btn-outline btn-xs" style="color: var(--rose-light); border-color: rgba(244, 63, 94, 0.4);" onclick="window.epoche.deletePaper('${p.id}')">
+              🗑️ Delete
+            </button>
+          </div>
         </div>
       `;
     }).join('');
@@ -1459,17 +1481,55 @@ class EpocheApp {
       this.showToast('Paper details updated!', 'success');
     });
 
-    document.getElementById('btn-delete-paper-trigger')?.addEventListener('click', () => {
-      if (confirm(`Are you sure you want to delete "${paper.title}" from Epoché Command?`)) {
-        this.papers = StorageService.deletePaper(paper.id);
-        this.selectedRebuttalPaperId = this.papers[0]?.id || null;
-        this.closeModal('modal-paper-details');
-        this.renderAll();
-        this.showToast('Paper deleted from database.', 'info');
-      }
-    });
+    // Wire up delete buttons (both top header and bottom footer) with reliable in-place confirmation
+    const attachDeleteListener = (btnId) => {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      let isConfirming = false;
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!isConfirming) {
+          isConfirming = true;
+          btn.innerHTML = '⚠️ Click again to Confirm Delete';
+          btn.style.borderColor = 'var(--rose-primary)';
+          btn.style.background = 'rgba(244, 63, 94, 0.25)';
+          btn.style.color = '#ffffff';
+          setTimeout(() => {
+            isConfirming = false;
+            if (btn) {
+              btn.innerHTML = '🗑️ Delete Paper';
+              btn.style.borderColor = '';
+              btn.style.background = '';
+              btn.style.color = 'var(--rose-light)';
+            }
+          }, 3500);
+        } else {
+          this.closeModal('modal-paper-details');
+          this.deletePaper(paper.id);
+        }
+      };
+    };
+
+    attachDeleteListener('btn-delete-paper-trigger');
+    attachDeleteListener('btn-modal-top-delete');
 
     this.openModal('modal-paper-details');
+  }
+
+  deletePaper(paperId) {
+    const paper = this.papers.find(p => p.id === paperId);
+    const paperTitle = paper ? paper.title : 'Manuscript';
+    this.papers = StorageService.deletePaper(paperId);
+    if (this.selectedRebuttalPaperId === paperId) {
+      this.selectedRebuttalPaperId = this.papers[0]?.id || null;
+    }
+    this.renderAll();
+    this.showToast(`Deleted "${paperTitle.substring(0, 35)}..." from database.`, 'info');
+  }
+
+  confirmDelete(paperId) {
+    this.deletePaper(paperId);
   }
 
   // =========================================================================
